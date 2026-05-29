@@ -2,16 +2,19 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-//using System.Speech.Synthesis;
+using System.Speech.Synthesis;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Media;
 
 
 
 namespace CybersecurityAwarenessBotGUI_Part2
 {//start of namespace
-    
+
     public partial class MainWindow : Window
     {//start of class[
 
@@ -21,10 +24,10 @@ namespace CybersecurityAwarenessBotGUI_Part2
         Random random = new Random();
         string memoryFile = "memory.txt";
 
-        //private SpeechSynthesizer speechSynthesizer = new SpeechSynthesizer();
-        //private bool voiceEnabled = false;
+        private SpeechSynthesizer speechSynthesizer = new SpeechSynthesizer();
+        private bool voiceEnabled = false;
 
-        
+
         Dictionary<string, string[]> cyberResponses =
 
             new Dictionary<string, string[]>()
@@ -37,8 +40,9 @@ namespace CybersecurityAwarenessBotGUI_Part2
 
                          " Never click links in suspicious emails. Hover over the link to see the real URL. When in doubt, type the website address manually.",
                          " If an email claims you've won a prize or threatens account closure, that's a major red flag. Contact the company directly using official channels.",
-                         " Phishing attacks often mimic login pages. Always check that the URL starts with 'https://' and the site certificate is valid."                    }
-              
+                         " Phishing attacks often mimic login pages. Always check that the URL starts with 'https://' and the site certificate is valid."
+                    }
+
                 },
 
                 {
@@ -177,8 +181,65 @@ namespace CybersecurityAwarenessBotGUI_Part2
         {//start of constructor
 
             InitializeComponent();
-            
+            Loaded += MainWindow_Loaded;
+            LoadMemoryFromFile();
+
+
         }//end of constructor
+
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Populate quick topic buttons
+            foreach (string topic in QuickTopics)
+            {
+                Button btn = new Button
+                {
+                    Content = topic.ToUpper(),
+                    Margin = new Thickness(0, 4, 0, 0),
+                    Style = (Style)FindResource("CyberButton"),
+                    Height = 32,
+                    FontSize = 12
+                };
+                btn.Click += (s, ev) =>
+                {
+                    question_box.Text = $"Tell me about {topic}";
+                    send_question(null, null);
+                };
+                QuickTopicPanel.Children.Add(btn);
+            }
+
+
+            loginborder.Visibility = Visibility.Visible;
+            chatborder.Visibility = Visibility.Collapsed;
+
+
+        }
+
+        private bool hasPlayedGreeting=false;
+        public void voiceGreeting()
+        {
+            if (hasPlayedGreeting) return;
+            hasPlayedGreeting = true;
+
+            try
+            {
+                string audioFile = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Audio", "HAPPYCODERAWARENESSBOT.wav");
+                if (System.IO.File.Exists(audioFile))
+                {
+                    SoundPlayer player = new SoundPlayer(audioFile);
+                    player.Play();
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("Audio file not found: " + audioFile);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("voiceGreeting error: " + ex.Message);
+            }
+
+        }
 
         //Window Controls 
         private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -186,15 +247,9 @@ namespace CybersecurityAwarenessBotGUI_Part2
             if (e.ChangedButton == MouseButton.Left) DragMove();
         }
 
-        private void minimise_button(object sender, RoutedEventArgs e)
-        {
-            WindowState = WindowState.Minimized;
-        }
+        private void minimise_button(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 
-        private void close_buttonclick(object sender, RoutedEventArgs e)
-        {
-            Application.Current.Shutdown();
-        }
+        private void close_buttonclick(object sender, RoutedEventArgs e) => Application.Current.Shutdown();
 
 
         //Login 
@@ -209,41 +264,46 @@ namespace CybersecurityAwarenessBotGUI_Part2
         {
             if (e.Key == Key.Enter) login();
         }
-        private void EnterButton_Click(object sender, RoutedEventArgs e) =>login();
-        
+        private void EnterButton_Click(object sender, RoutedEventArgs e) => login();
+
         public void login()
         {
             string username = NameBox.Text.Trim().ToUpper();
+            SidebarUserName.Text = username.ToUpper();
 
-            if(string.IsNullOrEmpty(username))
+            if (string.IsNullOrEmpty(username))
             {
                 ShowError("Name cannot be empty, please add a valid name");
-                return;               
+                return;
             }
-            if(username.Length<2)
+            if (username.Length < 2)
             {
                 ShowError("Name must be at least 2 characters long.");
                 return;
             }
-            if(!Regex.IsMatch(username, @"^[a-zA-Z]+$"))
+            if (!Regex.IsMatch(username, @"^[a-zA-Z]+$"))
             {
                 ShowError("Name must only contain letters (A-Z), spaces or hyphens");
                 return;
             }
-                       
+
 
             name = username;
             ValidationMsg.Visibility = Visibility.Collapsed;
 
-            logo_grid.Visibility = Visibility.Hidden;
-            robotface_panel.Visibility = Visibility.Hidden;
-            loginform_panel.Visibility = Visibility.Hidden;
 
-            chat_grid.Visibility = Visibility.Visible;
+            loginborder.Visibility = Visibility.Collapsed;
+            chatborder.Visibility = Visibility.Visible;
+            SidebarUserName.Text = name;
 
-            chats_box.AppendText($"HAPPYCODER: Welcome to AI assistance. \nHow may I assist you today Mr\\\\Mrs: {name}!\n\n");
+            chats_box.AppendText($"HAPPYCODER: Welcome {name}! \n");
+            chats_box.AppendText($" I'm your cybersecurity assistant. Ask me about passwords, scams, privacy, phishing, and more.\n");
+            chats_box.AppendText($" You can also say 'I'm interested in [topic]' and I'll remember it. \n\n");
 
-            
+            //play the intro sound
+            voiceGreeting();
+            question_box.Focus();
+
         }
 
         private void ShowError(string msg)
@@ -253,52 +313,107 @@ namespace CybersecurityAwarenessBotGUI_Part2
             NameBox.Focus();
         }//end of show error
 
+
         //send a message/question
         private void send_question(object sender, RoutedEventArgs e)
         {
-            string message = chats_box.Text.Trim().ToLower();
-            if(string.IsNullOrEmpty(message))
+            string message = question_box.Text.Trim();
+            if (string.IsNullOrEmpty(message))
             {
-                chats_box.AppendText($"HAPPYCODER: Sorry i didn't understand that\n");
-                question_box.Clear();
+                chats_box.AppendText("HAPPYCODER: Please enter a message.\n");
                 return;
             }
 
-            chats_box.AppendText($"{name}: {chats_box}\n");
-            if(message.Contains("interested in"))
+            // Show user message correctly
+            chats_box.AppendText($"{name}: {message}\n");
+            question_box.Clear();
+
+            // Capture "I'm interested in ..."
+            if (message.ToLower().Contains("interested in"))
             {
                 SaveToFile(message);
-                
-            }else if(message.Contains("favourite topic"))
-            {
-                if(File.Exists(memoryFile))
-                {
-                    string savedTopic = File.ReadAllText(memoryFile);
-                    chats_box.AppendText($"HAPPYCODER: Your favourite topic is: {savedTopic}\n");
-                }
-                else
-                {
-                    chats_box.AppendText($"I don't know what your favourite topic is yet");
-                }
-                question_box.Clear() ;
-                return;
-                
+                return;  // let SaveToFile also show the bot's response
             }
 
+            // Get bot response
             string botResponse = chatbotResponse(message);
-            chats_box.AppendText($"HAPPYCODER: {botResponse} \n\n");
+            chats_box.AppendText($"HAPPYCODER: {botResponse}\n\n");
 
-            question_box.Clear();
+            // Voice output
+            if (voiceEnabled)
+            {
+                try { speechSynthesizer.SpeakAsync(botResponse); }
+                catch { }
+            }
+
+            chats_scroll.ScrollToEnd();
 
         }
 
 
         public string chatbotResponse(string message)
         {
+
+            if(message.Trim().Contains("help"))
+            {
+                return "You can ask me about any of these topics:\n\n" +
+               "  • password / password safety / password security\n" +
+               "  • phishing / phishing tips\n" +
+               "  • scam / scams\n" +
+               "  • privacy\n" +
+               "  • safe browsing\n" +
+               "  • malware\n" +
+               "  • ransomware\n" +
+               "  • social engineering\n" +
+               "  • two-factor authentication / 2fa\n" +
+               "  • data breaches\n" +
+               "  • firewalls\n" +
+               "  • encryption\n" +
+               "  • cyber threats\n" +
+               "  • cybersecurity tips\n\n" +
+               "Just type the topic you're interested in!";
+            }
+
+            if (message.Trim().ToLower().Contains("purpose") ||
+                message.Trim() == "options" ||
+                message.Trim() == "what can you do")
+
+            {
+                return "I can provide information on various cybersecurity topics, " +
+                "answer your questions, and help you stay safe online. " +
+                "Just ask me anything related to cybersecurity!";
+
+            }
+
+            if(message.Trim().Contains("hello") ||
+                message.Trim().ToLower() == "hi" ||
+                message.Trim().ToLower() == "hey")
+            {
+                return "Hello! How can I assist you with cybersecurity today?";
+            }
+
+            if(message.Trim().Contains("how are you?") ||
+                message.Trim() == "how are you doing?")
+            {
+                return "I am functioning perfectly! Ready to help you stay safe online. " +
+                        "\nHow can I assist you today?";
+            }
+            if(message.Trim().Contains("what is your name"))
+            {
+                return "My name is HAPPYCODER, your cybersecurity awareness bot!" +
+                        "\nHow can I assist you today?";
+            }
+            
+
             string sentiment = DetectSentiment(message);
+            UpdateSentimentUI(sentiment);
+
             bool moreInfor = isFollowUp(message);
+
             string topic = DetectTopic(message);
 
+
+            //continue previous topic if user asks for more
             if (string.IsNullOrEmpty(topic) && moreInfor && !string.IsNullOrEmpty(currentTopic))
             {
                 topic = currentTopic;
@@ -310,59 +425,128 @@ namespace CybersecurityAwarenessBotGUI_Part2
                 return BuildResponses(topic, sentiment, moreInfor);
             }
 
+            //sentiment without mentioned topic
             if (!string.IsNullOrEmpty(sentiment))
             {
-                return $"{GetSentimentSupport(sentiment)}, Tell me which cybersecurity topic is bothering you, such as phishing, malware, or scams, and  I will assit step by step";
+                return $"{GetSentimentSupport(sentiment)}, Tell me which cybersecurity topic you'd like to learn about (e.g., passwords, phishing, privacy).";
             }
 
-            return "I am build to respond to cybersecurity related questions\n";
+            return " I'm specialized in cybersecurity. Could you ask about passwords, phishing, scams, privacy, malware, or 2FA?";
         }
 
         public string DetectTopic(string message)
         {
+
+            message = message.ToLower();
+
+            // 1. Check keyword mapping
             foreach (var topic in topicKeyWord)
             {
                 if (topic.Value.Any(word => message.Contains(word)))
-                {
                     return topic.Key;
-                }
             }
+
+            // 2. Check direct topic names
             foreach (var topic in cyberResponses)
             {
-                if (message.Contains(topic.Key))
-                {
+                if (message.Contains(topic.Key.ToLower()))
                     return topic.Key;
-                }
             }
+
             return "";
         }
 
-        public string BuildResponses(string topic, string sentiment, bool moreInfor)
-        {
-            string[] foundResponce = cyberResponses[topic];
-            int index = random.Next(foundResponce.Length);
-            string responce = foundResponce[index];
-            string support = GetSentimentSupport(sentiment);
 
-            return responce;
+        private string BuildResponses(string topic, string sentiment,
+                                     bool moreInfor)
+        {
+            //if topic is  not found in the response dictionary, returns general tip
+            if (!cyberResponses.ContainsKey(topic))
+            {
+                return $"Let me give you a general cybersecurity tip: always keep your software updated and use strong, unique passwords.";
+            }
+
+            //random index
+            string[] foundResponse = cyberResponses[topic];
+            string chosenResponse = foundResponse[random.Next(foundResponse.Length)];
+
+            //if user has a favourite topic
+            string personalisation = "";
+            if (!string.IsNullOrEmpty(favouriteTopic) && favouriteTopic.Equals(topic, StringComparison.OrdinalIgnoreCase))
+            {
+                personalisation = $"(As someone interested in {favouriteTopic}, here's a key point) ";
+            }
+
+            //provide a different tip from the same topic 
+
+            if (moreInfor && foundResponse.Length > 1)
+            {
+                string alternative = foundResponse[random.Next(foundResponse.Length)];
+                while (alternative == chosenResponse && foundResponse.Length > 1)
+                    alternative = foundResponse[random.Next(foundResponse.Length)];
+                chosenResponse = alternative;
+
+            }
+
+            //if a user is worried, frustrated, or scared the GetSentimentSupport method returns an empathetic sentence
+            string supportPrefix = GetSentimentSupport(sentiment);
+            if (!string.IsNullOrEmpty(supportPrefix))
+                return $"{supportPrefix} {personalisation}{chosenResponse}";
+            else
+                return $"{personalisation}{chosenResponse}";
+
         }
+
 
         public string GetSentimentSupport(string sentiment)
         {
+
             if (sentiment == "worried")
             {
-                return $"Hey {name}, it's completely understandable to feel that way. Cybersecurity threats can seem overwhelming, but few careful habit can protect you.";
+                return $"{name}, it's completely normal to feel worried about online threats. Let me share a practical step to help you feel more secure:";
             }
 
             if (sentiment == "frustrated")
             {
-                return $"Hey {name}, I know this can feel frustrating. let's slow down and focus on one practical step at a time";
+                return $"{name}, I understand this can be frustrating. Let's break it down simply:";
+            }
+            if (sentiment == "scared")
+            {
+                return $"{name}, I know that you are scared right now. Let's try and break this down and understaand what is happening:";
             }
             return "";
         }
 
+        private void UpdateSentimentUI(string sentiment)
+        {
+            switch (sentiment)
+            {
+                case "worried":
+                    MoodDot.Fill = new SolidColorBrush(Colors.Gold);
+                    MoodLabel.Text = "Worried";
+                    break;
+                case "frustrated":
+                    MoodDot.Fill = new SolidColorBrush(Colors.OrangeRed);
+                    MoodLabel.Text = "Frustrated";
+                    break;
+                case "scared":
+                    MoodDot.Fill = new SolidColorBrush(Colors.Red);
+                    MoodLabel.Text = "Scared";
+                    break;
+                default:
+                    MoodDot.Fill = new SolidColorBrush(Colors.SpringGreen);
+                    MoodLabel.Text = "Neutral";
+                    break;
+
+            }
+        }
+
+
+        //sentiment detection
         public string DetectSentiment(string message)
         {
+            message = message.ToLower();
+
             if (message.Contains("worried") ||
                 message.Contains("anxious") ||
                 message.Contains("nervous") ||
@@ -380,48 +564,101 @@ namespace CybersecurityAwarenessBotGUI_Part2
             {
                 return "frustrated";
             }
+
+            if (message.Contains("fear") ||
+                message.Contains("unsure") ||
+                message.Contains("panic") ||
+                message.Contains("scared") ||
+                message.Contains("mistake"))
+            {
+                return "scared";
+            }
             return "";
         }
 
         public bool isFollowUp(string message)
         {
             return message.Contains("explain more") ||
-                message.Contains("more details") ||
-                message.Contains("i did not understand");
+                   message.Contains("more details") ||
+                   message.Contains("i don't understand") ||
+                   message.Contains("tell me more") ||
+                   message.Contains("another tip") ||
+                   message.Contains("give me another") ||
+                   message.Contains("elaborate");
         }
 
         public void SaveToFile(string message)
         {
-            if (message.Contains("interested    q in"))
+            if (message.ToLower().Contains("interested in"))
             {
-                string topic = message.Replace("i am interested in", "").Trim();
-                File.WriteAllText(memoryFile, topic);
-
-                chats_box.AppendText($"Chatbot: I will remember that your favorite topic is {topic}\n");
+                int idx = message.ToLower().IndexOf("interested in") + "interested in".Length;
+                favouriteTopic = message.Substring(idx).Trim();
+                File.WriteAllText(memoryFile, favouriteTopic);
+                chats_box.AppendText($"HAPPYCODER: Great! I'll remember that you're interested in '{favouriteTopic}'.\n");
             }
         }
 
+        private void LoadMemoryFromFile()
+        {
+            if (File.Exists(memoryFile))
+            {
+                try
+                {
+                    favouriteTopic = File.ReadAllText(memoryFile).Trim();
+                }
+                catch { }
+            }
+        }
+
+
         private void clear_chat(object sender, RoutedEventArgs e)
         {
-            
+            chats_box.Clear();
+            chats_box.AppendText(" [Chats cleared] ");
+
         }
 
         private void memory_recap(object sender, RoutedEventArgs e)
         {
+
+            chats_box.AppendText("**MEMORY RECAP**\n");
+            chats_box.AppendText($"User: {name}\n");
+            if (!string.IsNullOrEmpty(favouriteTopic))
+            {
+                chats_box.AppendText($"Favorite topic: {favouriteTopic}\n");
+            }
+            else
+                chats_box.AppendText($"Favorite topic: not set yet (say 'I'm interested in privacy')\n");
+            chats_box.AppendText($"Last discussed topic: {currentTopic}\n\n");
 
         }
 
         private void voice_toggle(object sender, RoutedEventArgs e)
         {
 
+            voiceEnabled = !voiceEnabled;
+            Button btn = sender as Button;
+            if (btn != null)
+            {
+                btn.Content = voiceEnabled ? "Voice ON" : "Voice OFF";
+            }
+            if (voiceEnabled)
+            {
+                try
+                {
+                    speechSynthesizer.SpeakAsync("Voice mode activated");
+                }
+                catch { }
+            }
+
         }
 
         private void close_button(object sender, RoutedEventArgs e) => Application.Current.Shutdown();
 
 
-        
 
-        
+
+
     }//end of class
 }//end of namespace
 

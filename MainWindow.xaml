@@ -87,12 +87,12 @@
 
     </Window.Resources>
 
-    <Grid>
-        <!--start of parent grid-->
+    <Grid><!--start of parent grid-->
 
         <!-- Drop shadow around entire window -->
         <!-- Outer border: provides rounded corners, background, and a visible border line -->
-        <Border 
+        <Border
+            x:Name="loginborder"
             CornerRadius="12" 
             Background="#0D1117"
             BorderBrush="#30363D" 
@@ -134,7 +134,7 @@
 
                     <Grid 
                         x:Name="titlebar_grid"
-                        Visibility="Visible"                        
+                        Visibility="Visible"                       
                         >
 
                         <TextBlock 
@@ -169,7 +169,7 @@
                 <!--start of main content area-->
                 <Grid 
                     x:Name="logo_grid"
-                    Visibility="Hidden"
+                    Visibility="Visible"
                     Grid.Row="1">
 
                     <Grid.RowDefinitions>
@@ -254,7 +254,6 @@ Stay Safe * Stay Secure
                     <StackPanel 
                         x:Name="loginform_panel"
                         Visibility="Visible"
-                        
                         Grid.Row="2" 
                         Width="370"
                         HorizontalAlignment="Center" 
@@ -332,6 +331,8 @@ Stay Safe * Stay Secure
 
         <!-- Outer shadow container -->
         <Border 
+            x:Name="chatborder"
+            Visibility="Collapsed"
             CornerRadius="12" 
             Background="#0D1117"
             BorderBrush="#30363D" 
@@ -346,7 +347,8 @@ Stay Safe * Stay Secure
             </Border.Effect>
 
             <Grid
-                x:Name="title_grid">
+                x:Name="title_grid"
+                Visibility="Visible">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="44"/>
                     <!-- title bar -->
@@ -401,16 +403,15 @@ Stay Safe * Stay Secure
 
                             <Button 
                                 Content="─" 
-                                Click="minimise_button"
-                    
-                    Width="28" 
-                    Height="28" 
-                    Background="Transparent"
-                    Foreground="#8B949E" 
-                    BorderThickness="0"
-                    FontSize="14" 
-                    Cursor="Hand" 
-                    VerticalAlignment="Center"/>
+                                Click="minimise_button"                  
+                                Width="28" 
+                                Height="28" 
+                                Background="Transparent"
+                                Foreground="#8B949E" 
+                                BorderThickness="0"
+                                FontSize="14" 
+                                Cursor="Hand" 
+                                VerticalAlignment="Center"/>
 
                             <Button 
                     Content="✕" 
@@ -437,35 +438,43 @@ Stay Safe * Stay Secure
                         <ColumnDefinition Width="*"/>
                         <!-- chat -->
                     </Grid.ColumnDefinitions>
+                    
+                    
 
-                    <!-- ── SIDEBAR ─────────────────────────────────────────────── -->
+                    <!-- SIDEBAR -->
                     <Border 
                 Grid.Column="0" 
                 Background="#161B22"
                 BorderBrush="#30363D" 
                 BorderThickness="0,0,1,0"
                 CornerRadius="0,0,0,12">
-                        <DockPanel>
 
-                            <!-- Bot info panel at top -->
-                            <StackPanel 
-                        DockPanel.Dock="Top" 
-                        Margin="14,16,14,10">
-                                <!-- ASCII robot -->
-                                <TextBlock 
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Scrollable top area -->
+                            <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+                                <StackPanel Margin="14,16,14,10">
+
+
+                                    <!-- ASCII robot -->
+                                    <TextBlock 
                             FontFamily="Consolas" 
-                            FontSize="11"
+                            FontSize="9"
                             Foreground="#39FF14" 
                             TextAlignment="Center"
                             Margin="0,0,0,10"
                             xml:space="preserve">
-                                    <TextBlock.Effect>
-                                        <DropShadowEffect 
+                                        <TextBlock.Effect>
+                                            <DropShadowEffect 
                                     Color="#39FF14" 
                                     BlurRadius="8" 
                                     ShadowDepth="0" 
                                     Opacity="0.7"/>
-                                    </TextBlock.Effect>
+                                        </TextBlock.Effect>
                             
    /        \
    /__________\
@@ -478,148 +487,119 @@ Stay Safe * Stay Secure
    |__________|
 Stay Safe * Stay Secure
 
-                                </TextBlock>
-
-                                <TextBlock 
-                            Text="HAPPYCODER" 
-                            Foreground="#00E5FF"
-                            FontFamily="Consolas" 
-                            FontWeight="Bold"
-                            FontSize="14" 
-                            HorizontalAlignment="Center">
-
-                                    <TextBlock.Effect>
-                                        <DropShadowEffect 
-                                    Color="#00E5FF" 
-                                    BlurRadius="10" 
-                                    ShadowDepth="0" 
-                                    Opacity="0.7"/>
-                                    </TextBlock.Effect>
-                                </TextBlock>
-
-                                <TextBlock 
-                            Text="Cybersecurity Bot" 
-                            Foreground="#8B949E"
-                            FontFamily="Consolas" 
-                            FontSize="10"
-                            HorizontalAlignment="Center" 
-                            Margin="0,2,0,0"/>
-
-                                <Rectangle 
-                            Height="1" 
-                            Fill="#30363D" 
-                            Margin="0,12,0,12"/>
-
-                                <!-- User info -->
-                                <TextBlock 
-                            Text="LOGGED IN AS" 
-                            Foreground="#8B949E"
-                            FontFamily="Consolas" 
-                            FontSize="9" 
-                            Margin="0,0,0,4"/>
-
-                                <TextBlock 
-                            x:Name="SidebarUserName"
-                            Foreground="#E6EDF3" 
-                            FontFamily="Consolas"
-                            FontSize="13" 
-                            FontWeight="Bold"/>
-
-                                <Rectangle 
-                            Height="1" 
-                            Fill="#30363D" 
-                            Margin="0,12,0,8"/>
-
-                                <!-- Sentiment display -->
-                                <TextBlock 
-                            Text="CURRENT MOOD" 
-                            Foreground="#8B949E"
-                            FontFamily="Consolas" 
-                            FontSize="9" 
-                            Margin="0,0,0,4"/>
-
-                                <StackPanel 
-                            Orientation="Horizontal">
-
-                                    <Ellipse 
-                                x:Name="MoodDot" 
-                                Width="10" 
-                                Height="10"
-                                Fill="#8B949E" 
-                                Margin="0,0,6,0" 
-                                VerticalAlignment="Center"/>
+                                    </TextBlock>
 
                                     <TextBlock 
-                                x:Name="MoodLabel" 
-                                Text="Neutral"
-                                Foreground="#8B949E" 
-                                FontFamily="Consolas" 
-                                FontSize="11"/>
+                    Text="HAPPYCODER" 
+                    Foreground="#00E5FF"
+                    FontFamily="Consolas" 
+                    FontWeight="Bold"
+                    FontSize="14" 
+                    HorizontalAlignment="Center">
+                                        <TextBlock.Effect>
+                                            <DropShadowEffect Color="#00E5FF" BlurRadius="10" ShadowDepth="0" Opacity="0.7"/>
+                                        </TextBlock.Effect>
+                                    </TextBlock>
+
+                                    <TextBlock 
+                    Text="Cybersecurity Bot" 
+                    Foreground="#8B949E"
+                    FontFamily="Consolas" 
+                    FontSize="10"
+                    HorizontalAlignment="Center" 
+                    Margin="0,2,0,0"/>
+
+                                    <Rectangle Height="1" Fill="#30363D" Margin="0,12,0,12"/>
+
+                                    <!-- User info -->
+                                    <TextBlock 
+                    Text="LOGGED IN AS" 
+                    Foreground="#8B949E"
+                    FontFamily="Consolas" 
+                    FontSize="9" 
+                    Margin="0,0,0,4"/>
+                                    <TextBlock 
+                    x:Name="SidebarUserName"
+                    Foreground="#E6EDF3" 
+                    FontFamily="Consolas"
+                    FontSize="13" 
+                    FontWeight="Bold"/>
+
+                                    <Rectangle Height="1" Fill="#30363D" Margin="0,12,0,8"/>
+
+                                    <!-- Sentiment display -->
+                                    <TextBlock 
+                    Text="CURRENT MOOD" 
+                    Foreground="#8B949E"
+                    FontFamily="Consolas" 
+                    FontSize="9" 
+                    Margin="0,0,0,4"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Ellipse 
+                        x:Name="MoodDot" 
+                        Width="10" Height="10"
+                        Fill="#8B949E" 
+                        Margin="0,0,6,0" 
+                        VerticalAlignment="Center"/>
+                                        <TextBlock 
+                        x:Name="MoodLabel" 
+                        Text="Neutral"
+                        Foreground="#8B949E" 
+                        FontFamily="Consolas" 
+                        FontSize="11"/>
+                                    </StackPanel>
+
+                                    <Rectangle Height="1" Fill="#30363D" Margin="0,12,0,8"/>
+
+                                    <TextBlock 
+                    Text="QUICK TOPICS" 
+                    Foreground="#8B949E"
+                    FontFamily="Consolas" 
+                    FontSize="9" 
+                    Margin="0,0,0,6"/>
+
+                                    <!-- Quick topic buttons will be added here dynamically -->
+                                    <StackPanel x:Name="QuickTopicPanel" Margin="0,0,0,8"/>
+
                                 </StackPanel>
-
-                                <Rectangle 
-                            Height="1" 
-                            Fill="#30363D" 
-                            Margin="0,12,0,8"/>
-
-                                <TextBlock 
-                            Text="QUICK TOPICS" 
-                            Foreground="#8B949E"
-                            FontFamily="Consolas" 
-                            FontSize="9" 
-                            Margin="0,0,0,6"/>
-                            </StackPanel>
-
-                            <!-- Scrollable quick-topic buttons -->
-                            <ScrollViewer 
-                        DockPanel.Dock="Top" 
-                        VerticalScrollBarVisibility="Auto"
-                        MaxHeight="260" Margin="6,0,6,0">
-
-                                <StackPanel 
-                            x:Name="QuickTopicPanel">
-                                    <!-- Populated in code-behind -->
-                                </StackPanel>
-
                             </ScrollViewer>
-
-                            <!-- Bottom buttons -->
+                            <!--Bottom buttons-->
                             <StackPanel 
-                        DockPanel.Dock="Bottom" 
-                        Margin="10,10,10,14">
+                                Grid.Row="1" 
+                                Margin="10,10,10,14">
 
                                 <Rectangle 
-                            Height="1" 
-                            Fill="#30363D" 
-                            Margin="0,0,0,10"/>
+                                    Height="1" 
+                                    Fill="#30363D" 
+                                    Margin="0,0,0,10"/>
+
+                                <Button Content=" Clear Chat"
+                                        Click="clear_chat"
+                                        Margin="0,0,0,4"/>
 
                                 <Button 
-                            Content="🗑  Clear Chat"
-                            Click="clear_chat"
-                            Margin="0,0,0,4"/>
-                                <Button 
-                            Content="📋  Memory Recap"
+                            Content="  Memory Recap"
                             Click="memory_recap"
                             Margin="0,0,0,4"/>
                                 <Button 
-                            Content="🔊  Voice Toggle"
+                            Content="  Voice Toggle"
                              Click="voice_toggle"
                             Margin="0,0,0,4"/>
                                 <Button 
-                            Content="✕  Exit"
+                            Content="  Exit"
                             Click="close_button"/>
+                                
                             </StackPanel>
+                        </Grid>
 
-                            <Border/>
-                            <!-- spacer -->
-                        </DockPanel>
                     </Border>
 
 
                     <Grid
-                x:Name="banner_grid"
-                Grid.Column="1"               
-                >
+                        x:Name="banner_grid"
+                        Grid.Column="1"               
+                        >
+                        
                         <!--start of banner grid-->
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -638,7 +618,8 @@ Stay Safe * Stay Secure
                     Background="#0A0F14"
                     BorderBrush="#30363D"
                     BorderThickness="0,0,0,0"
-                    Padding="10,8,10,8"                    
+                    Padding="10,8,10,8"
+                            Margin="0,0,0,5"
                     >
                             <!--start of full ascii logo order-->
                             <Grid>
@@ -691,12 +672,15 @@ Stay Safe * Stay Secure
 
                         </Border>
                         <!--end of full asci logo banner-->
+                        
 
 
 
                         <Grid
                     x:Name="chat_grid"
                     Visibility="Visible"
+                            Grid.Row="1"
+                            Grid.RowSpan="2"
                     >
                             <!--start of chat grid-->
 
@@ -707,56 +691,66 @@ Stay Safe * Stay Secure
                             </Grid.RowDefinitions>
 
                             <ScrollViewer
-                        Grid.Row="1"
+                        Grid.Row="0"
                         x:Name="chats_scroll"
-                        Margin="0,180,0,0"
+                        Margin="10,10,10,10"
                         VerticalScrollBarVisibility="Auto"              
                         >
 
                                 <TextBox
-                            x:Name="chats_box"
-                            Height="400"
-                            Width="620"
-                            Margin="0,0,0,50"
-                            Background="#8B949E"
-                            BorderThickness="1.5"
-                            BorderBrush="Cyan"
-                            FontSize="14"
-                            VerticalScrollBarVisibility="Auto"
-                            TextWrapping="Wrap"
-                            IsReadOnly="True"
-                            AcceptsReturn="True"/>
+                                    x:Name="chats_box"
+                                    
+                                    Background="#8B949E"
+                                    Foreground="#E0E0E0"
+                                    BorderThickness="1.5"
+                                    BorderBrush="Cyan"
+                                    FontSize="14"
+                                    VerticalScrollBarVisibility="Auto"
+                                    TextWrapping="Wrap"
+                                    IsReadOnly="True"
+                                    AcceptsReturn="True"
+                                    />
 
 
                             </ScrollViewer>
                             <!--left, top, right, bottom-->
+                            
+                            <!--input row: textbox + send button-->
 
                             <StackPanel
                                    
-                        Orientation="Horizontal"
-                        Grid.Row="1"
-                        Margin="10"
-                >
+                                Orientation="Horizontal"
+                                Grid.Row="1"
+                                Margin="10,10,10,15"
+                                >
 
                                 <TextBox           
-                            x:Name="question_box"
-                            Height="50"
-                            Width="462"
-                            Margin="0,610,0,0"
-                            Background="White"
-                            BorderBrush="#39FF14"
-                            BorderThickness="1.5" 
-                            />
+                                    x:Name="question_box"
+                                    Height="50"
+                                    
+                                    Margin="0,0,10,0"
+                                    Background="White"
+                                    BorderBrush="#39FF14"
+                                    BorderThickness="1.5"
+                                    FontSize="14"
+                                    VerticalAlignment="Center"
+                                    Padding="10,0,10,0"
+                                    TextWrapping="Wrap"
+                                    AcceptsReturn="True"
+                                    Width="400"
+                                    />
 
 
 
                                 <Button
-                            Height="50"
-                            Width="120"
-                            Margin="0,610,0,0"
-                            Background="#00E5FF"
-                            Content="SEND"
-                            Click="send_question"
+                                    x:Name="send_button"
+                                    Height="50"
+                                    Width="100"
+                                    Background="#00E5FF"
+                                    FontWeight="Bold"
+                                    FontSize="14"
+                                    Content="SEND"
+                                    Click="send_question"
                          />
 
                             </StackPanel>
@@ -773,4 +767,3 @@ Stay Safe * Stay Secure
         </Border><!--end of message window border-->
     </Grid><!--end of parent grid-->
 </Window>
-<!--#1F2937-->
