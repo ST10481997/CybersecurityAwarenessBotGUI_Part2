@@ -46,14 +46,21 @@ The GUI provides a familiar chat interface, better organisation, and immediate v
 ### Improvement: 
 The GUI reduces typing, adds persistent memory, gives voice feedback control, and follows standard window behaviours.
 
-## 3. Intelligence & Responsiveness
+## 3. Intelligence & Responsiveness (Part 1 - Console & Part 2 - GUI)
 
 
-## 4. Code Architecture and Maintainability
+## 4. Code Architecture and Maintainability (Part 1 - Console & Part 2 - GUI)
 
 
 ## 5. Summary of Added features (Part 2)
-
+* Login screen with name validation and clear error feedback
+* Sidebar panel showing user info, mood indicator, and quick action buttons
+* Quick topic buttons – one‑click access to common subjects
+* Sentiment detection and mood dot (green = neutral, gold = worried, orange‑red = frustrated, red = scared)
+* Text‑to‑speech toggle – bot can speak its answers
+* Memory Recap – displays stored favourite topic and last discussed topic
+* Clear Chat button – wipes conversation display without losing memory
+* Persistent storage – favourite topic survives application restarts
 
 ## Conclusion
 The transition from Part 1 to Part 2 turned a functional console script into a polished, interactive desktop application.
