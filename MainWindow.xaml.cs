@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Media;
+using System.CodeDom;
 
 
 
@@ -18,12 +19,13 @@ namespace CybersecurityAwarenessBotGUI_Part2
     public partial class MainWindow : Window
     {//start of class[
 
-        string name = "";
-        string favouriteTopic = "";
-        string currentTopic = "";
-        Random random = new Random();
-        string memoryFile = "memory.txt";
+        string name = ""; //storem logged-in users name
+        string favouriteTopic = ""; //favourite topic of the user
+        string currentTopic = ""; //last discussed topic
+        Random random = new Random(); //used to pick random tips
+        string memoryFile = "memory.txt"; //file path to store favourite topic
 
+        //text to speech
         private SpeechSynthesizer speechSynthesizer = new SpeechSynthesizer();
         private bool voiceEnabled = false;
 
@@ -181,7 +183,7 @@ namespace CybersecurityAwarenessBotGUI_Part2
         {//start of constructor
 
             InitializeComponent();
-            Loaded += MainWindow_Loaded;
+            Loaded += MainWindow_Loaded; 
             LoadMemoryFromFile();
 
 
@@ -200,6 +202,8 @@ namespace CybersecurityAwarenessBotGUI_Part2
                     Height = 32,
                     FontSize = 12
                 };
+
+                //when clicked, the button automatically fille the question box and sends message
                 btn.Click += (s, ev) =>
                 {
                     question_box.Text = $"Tell me about {topic}";
@@ -208,13 +212,14 @@ namespace CybersecurityAwarenessBotGUI_Part2
                 QuickTopicPanel.Children.Add(btn);
             }
 
-
+            //start with login screen visible, chat screen hidden
             loginborder.Visibility = Visibility.Visible;
             chatborder.Visibility = Visibility.Collapsed;
 
 
         }
 
+        //play welcome sound file wheh user first logs in
         private bool hasPlayedGreeting=false;
         public void voiceGreeting()
         {
@@ -497,7 +502,7 @@ namespace CybersecurityAwarenessBotGUI_Part2
 
         }
 
-
+        // Returns an empathetic sentence based on the user's detected sentiment.
         public string GetSentimentSupport(string sentiment)
         {
 
@@ -517,6 +522,7 @@ namespace CybersecurityAwarenessBotGUI_Part2
             return "";
         }
 
+        // Updates the sidebar's mood indicator (colored dot and label) based on sentiment.
         private void UpdateSentimentUI(string sentiment)
         {
             switch (sentiment)
@@ -543,6 +549,7 @@ namespace CybersecurityAwarenessBotGUI_Part2
 
 
         //sentiment detection
+        //detects emotional sentiment from the users message by looking for the keywords
         public string DetectSentiment(string message)
         {
             message = message.ToLower();
@@ -576,6 +583,7 @@ namespace CybersecurityAwarenessBotGUI_Part2
             return "";
         }
 
+        //checks if the user is asking for a follow up or a more detailed explanation
         public bool isFollowUp(string message)
         {
             return message.Contains("explain more") ||
@@ -587,6 +595,7 @@ namespace CybersecurityAwarenessBotGUI_Part2
                    message.Contains("elaborate");
         }
 
+        //save the users expressed favourite topic to a text file
         public void SaveToFile(string message)
         {
             if (message.ToLower().Contains("interested in"))
@@ -598,6 +607,7 @@ namespace CybersecurityAwarenessBotGUI_Part2
             }
         }
 
+        //loads previously saved topics from the memory file 
         private void LoadMemoryFromFile()
         {
             if (File.Exists(memoryFile))
@@ -606,11 +616,11 @@ namespace CybersecurityAwarenessBotGUI_Part2
                 {
                     favouriteTopic = File.ReadAllText(memoryFile).Trim();
                 }
-                catch { }
+                catch { } //ignore read errors
             }
         }
 
-
+        //clears the chat display and shows [chats cleared] message
         private void clear_chat(object sender, RoutedEventArgs e)
         {
             chats_box.Clear();
@@ -618,6 +628,7 @@ namespace CybersecurityAwarenessBotGUI_Part2
 
         }
 
+        //display a recap of the users memory: name, favourite topic, last discussed topic
         private void memory_recap(object sender, RoutedEventArgs e)
         {
 
@@ -653,6 +664,7 @@ namespace CybersecurityAwarenessBotGUI_Part2
 
         }
 
+        //close the entire application
         private void close_button(object sender, RoutedEventArgs e) => Application.Current.Shutdown();
 
 
