@@ -59,3 +59,9 @@ The GUI reduces typing, adds persistent memory, gives voice feedback control, an
 The transition from Part 1 to Part 2 turned a functional console script into a polished, interactive desktop application.
 Key improvements include a modern GUI, emotional intelligence, varied responses, memory persistence, and user‑friendly controls – all while maintaining the core cybersecurity educational mission.
 
+# Author
+[Ntokozo Happiness Tshabalala] [ST10481997]
+
+# Diploma in Software Development 
+[Programming 2A] [Rosebank College Braamfontein]
+
