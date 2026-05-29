@@ -2,20 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
+//using System.Speech.Synthesis;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows.Threading;
-using System.Xml.Linq;
 
 
 
@@ -23,22 +13,18 @@ namespace CybersecurityAwarenessBotGUI_Part2
 {//start of namespace
     
     public partial class MainWindow : Window
-    {//start of class
+    {//start of class[
 
         string name = "";
+        string favouriteTopic = "";
+        string currentTopic = "";
         Random random = new Random();
         string memoryFile = "memory.txt";
-        string currentTopic = "";
 
-        private static readonly List<string> QuickTopics = new List<string>
-        {
-            "password", "phishing", "scam", "privacy",
-            "malware", "ransomware", "2fa", "encryption",
-            "safe browsing", "firewalls", "social engineering",
-            "cybersecurity tips", "help"
-        };
+        //private SpeechSynthesizer speechSynthesizer = new SpeechSynthesizer();
+        //private bool voiceEnabled = false;
 
-
+        
         Dictionary<string, string[]> cyberResponses =
 
             new Dictionary<string, string[]>()
@@ -48,45 +34,32 @@ namespace CybersecurityAwarenessBotGUI_Part2
                     "phishing",
                     new string[]
                     {
-                         "Fraudulent Communication for Data Theft\r\nPhishing involves sending deceptive messages, often via email or text, that appear to come from legitimate sources. The attacker’s goal is to steal sensitive information such as login credentials, financial data, or to install malware on the victim’s device.",
-                         "Social Engineering Exploiting Human Trust\r\nPhishing is a form of social engineering that manipulates human psychology. Attackers exploit trust, curiosity, or urgency to trick victims into revealing confidential information, rather than exploiting technical vulnerabilities.",
-                         "Impersonation of Legitimate Entities\r\nPhishers disguise themselves as banks, government agencies, online platforms, or even colleagues. By mimicking trusted entities, they convince victims to provide personal information or click on malicious links.",
-                         "Multiple Attack Channels\r\nPhishing is not limited to email. It can occur through phone calls (vishing), text messages (smishing), social media, or fake websites. Each channel uses deception to achieve the same goal: obtaining sensitive data. "
-                    }
-               },
+
+                         " Never click links in suspicious emails. Hover over the link to see the real URL. When in doubt, type the website address manually.",
+                         " If an email claims you've won a prize or threatens account closure, that's a major red flag. Contact the company directly using official channels.",
+                         " Phishing attacks often mimic login pages. Always check that the URL starts with 'https://' and the site certificate is valid."                    }
+              
+                },
 
                 {
                     "malware",
                     new string[]
                     {
-                        "This type of malware encrypts the victim's files and demands a ransom payment to restore access. A notable example is the WannaCry ransomware attack, which affected thousands of computers worldwide.",
-                        "Spyware secretly monitors user activity and collects personal information without consent. It can track browsing habits, capture keystrokes, and gather sensitive data like passwords.",
-                        "This malware disguises itself as legitimate software to trick users into installing it. Once activated, it can create backdoors for other malicious software. An example is the Zeus Trojan, which targets banking information",
-                        "While not always harmful, adware displays unwanted advertisements and can slow down system performance. Some adware can also track user behavior and collect data for targeted advertising."
-                    }
 
-                },
+                         " Keep your operating system and antivirus software updated. Enable automatic updates if possible.",
+                         " Don't download software from torrent sites or pop-up ads. Use official app stores or developer websites.",
+                         " Be wary of email attachments, even from known senders, if they are unexpected. Malware often spreads via macro-enabled documents."                   }
 
-                {
-                    "cyber threats",
-                    new string[]
-                    {
-
-                    }
-                },
-
-                {
-                    "safe browsing",
-                    new string[]
-                    {
-
-                    }
                 },
 
                 {
                     "ransomware",
                     new string[]
                     {
+
+                         " Maintain offline backups. Ransomware can't encrypt data that isn't connected to your computer.",
+                         " Do not pay the ransom. It encourages criminals and there's no guarantee you'll get your files back.",
+                         " Disable macros in Office files and use application whitelisting to block unknown executables."
 
                     }
                 },
@@ -96,6 +69,11 @@ namespace CybersecurityAwarenessBotGUI_Part2
                     new string[]
                     {
 
+                         " Always verify identities through a different channel. If someone calls claiming to be IT support, hang up and call the official number.",
+                         " Be suspicious of urgent requests from 'bosses' or 'vendors' asking for gift cards or wire transfers. These are classic scams.",
+                         " Never share your password over the phone, even if the caller says they're from 'security'. Real security teams will never ask for it."
+
+
                     }
                 },
 
@@ -103,6 +81,10 @@ namespace CybersecurityAwarenessBotGUI_Part2
                     "password safety",
                     new string[]
                     {
+
+                        " Use a password manager to generate and store unique 12+ character passwords. Never reuse passwords across sites.",
+                        " Enable two-factor authentication (2FA) on all accounts that support it. This adds a critical extra layer of security.",
+                        " Avoid using personal info (birthdays, names) in passwords. Instead, use a phrase like 'BlueCoffee$42!Running'."
 
                     }
                 },
@@ -112,6 +94,10 @@ namespace CybersecurityAwarenessBotGUI_Part2
                     new string[]
                     {
 
+                        " Look for the padlock icon in the address bar before entering any personal information on a website.",
+                        " Regularly clear your browser cache, cookies, and history to reduce tracking and free up space.",
+                        " Use a search engine that doesn't track you (like DuckDuckGo) and enable 'Do Not Track' in your browser settings."
+
                     }
                 },
 
@@ -120,6 +106,10 @@ namespace CybersecurityAwarenessBotGUI_Part2
                     new string[]
                     {
 
+                        " Set up 2FA using an authenticator app (Google Authenticator, Authy) rather than SMS – it's more secure against SIM swapping.",
+                        " Backup codes are essential. Store them in a safe place (not on your primary device) in case you lose access to your 2FA method.",
+                        " Never share your 2FA codes with anyone, even if they claim to be tech support. Real services never ask for your one-time code."
+
                     }
                 },
                 {
@@ -127,12 +117,20 @@ namespace CybersecurityAwarenessBotGUI_Part2
                     new string[]
                     {
 
+                        " Check if your email has been in a breach using 'haveibeenpwned.com'. Change passwords immediately for affected accounts.",
+                        " Use unique passwords for every service – if one site gets breached, other accounts remain safe.",
+                        " Enable login alerts and monitor your bank/credit card statements regularly for unauthorized transactions."
+
                     }
                 },
                 {
                     "firewalls",
                     new string[]
                     {
+
+                         " A firewall monitors incoming and outgoing traffic. Keep Windows Defender Firewall or your router's firewall enabled at all times.",
+                         " For advanced protection, consider a next-gen firewall (NGFW) that includes intrusion prevention and application control.",
+                         " On public Wi-Fi, your firewall is still important, but also use a VPN to encrypt all traffic beyond basic filtering."
 
                     }
                 },
@@ -142,13 +140,9 @@ namespace CybersecurityAwarenessBotGUI_Part2
                     new string[]
                     {
 
-                    }
-                },
-
-                {
-                    "password security",
-                    new string[]
-                    {
+                        " Full-disk encryption (BitLocker on Windows, FileVault on Mac) protects your data if your device is lost or stolen.",
+                        " Use end-to-end encrypted messaging apps (Signal, WhatsApp) for sensitive conversations. Email is not encrypted by default.",
+                        " For cloud storage, use client-side encryption tools like Cryptomator or VeraCrypt before uploading files."
 
                     }
                 }
@@ -158,19 +152,27 @@ namespace CybersecurityAwarenessBotGUI_Part2
         {
             { "phishing", new string[]{ "fake emails", "suspicious email", "phishing" } },
             { "malware", new string[]{ "virus", "spyware", "adware", "trojan", "malware"} },
-            { "cyber threats", new string[]{ ""} },
-            { "password safety", new string[]{ ""} },
-            { "2fa", new string[]{ ""} },
-            { "ransomware", new string[]{ ""} },
-            { "safe browsing", new string[]{ ""} },
-            { "social enginnering", new string[]{ ""} },
-            { "data breaches", new string[]{ ""} },
-            { "firewalls", new string[]{ ""} },
-            { "encryption", new string[]{ ""} },
-            { "cpassword security", new string[]{ ""} },
+            { "password", new string[]{ " password", "passphrase", "login", "account security", "strong password" } },
+            { "2fa", new string[]{ "2fa", "two factor", "multi factor", "mfa", "authenticator" } },
+            { "ransomware", new string[]{ "ransomware", "encrypt files", "pay ransom" } },
+            { "safe browsing", new string[]{ " safe browsing", "secure browsing", "https", "safe website" } },
+            { "social enginnering", new string[]{ " social engineering", "manipulation", "pretend", "impersonate" } },
+            { "data breaches", new string[]{ "  data breach", "leak", "compromised", "hacked database" } },
+            { "firewalls", new string[]{ " firewall", "network security", "block traffic" } },
+            { "encryption", new string[]{ " encryption", "encrypt", "decrypt", "cipher" } },
         };
 
-       
+        //Quick topics
+        private static readonly List<string> QuickTopics = new List<string>
+        {
+            "password", "phishing", "scam", "privacy",
+            "malware", "ransomware", "2fa", "encryption",
+            "safe browsing", "firewalls", "social engineering",
+            "cybersecurity tips", "help"
+        };
+
+
+
         public MainWindow()
         {//start of constructor
 
