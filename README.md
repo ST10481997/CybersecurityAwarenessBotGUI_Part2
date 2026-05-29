@@ -71,6 +71,26 @@ The GUI reduces typing, adds persistent memory, gives voice feedback control, an
 The GUI version feels more intelligent – it varies responses, continues conversations, and adapts to the user’s emotional state.
 
 ## 4. Code Architecture and Maintainability (Part 1 - Console & Part 2 - GUI)
+### Structure
+1. Single 'Chatbot' class with all methods
+1. WPF separation: XAML for UI, code‑behind for logic
+   
+### State management
+2. Variables inside the running instance
+2. Uses file‑based memory (memory.txt) + class fields, persists between sessions
+
+### Extensibility
+3. Hard‑coded topic dictionary	
+3. Two dictionaries: cyberResponses (tips) and topicKeyWord (synonyms) – easier to add new topics
+
+### Event handling
+4. Linear loop with 'ReadLine()'
+4. Asynchronous event‑driven (button clicks, key presses)
+
+### Audio/ speech
+5. 'SoundPlayer' with hardcoded path
+5. 'SoundPlayer + SpeechSynthesizer' with relative path and error handling
+
 ### Improvement: 
 The GUI version is more modular, data‑driven, and suitable for future expansion (e.g., adding a database, more sentiment keywords, or cloud APIs)
 
