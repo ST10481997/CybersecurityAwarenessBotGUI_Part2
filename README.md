@@ -47,10 +47,32 @@ The GUI provides a familiar chat interface, better organisation, and immediate v
 The GUI reduces typing, adds persistent memory, gives voice feedback control, and follows standard window behaviours.
 
 ## 3. Intelligence & Responsiveness (Part 1 - Console & Part 2 - GUI)
+### Topic matching
+1. Simple dictionary lookup (exact or word‑based)	
+1. Dictionary + keyword synonyms + fallback to general tips
 
+### Response variety
+2. Single static answer per topic
+2. Randomised tips from a pool of multiple answers per topic
+   
+### Follow-up handling
+3. None – user had to re‑type the topic
+3. Detects phrases like “tell me more”, “another tip” and gives a different answer
+   
+### Sentiment analysis
+4. No emotional awareness
+4. Detects worried, frustrated, scared keywords → empathetic prefix + mood dot
+
+### Personalisation
+5. Only used the user’s name in welcome
+5.Remembers favourite topic and references it in responses ((As someone interested in ...))
+
+### Improvement: 
+The GUI version feels more intelligent – it varies responses, continues conversations, and adapts to the user’s emotional state.
 
 ## 4. Code Architecture and Maintainability (Part 1 - Console & Part 2 - GUI)
-
+### Improvement: 
+The GUI version is more modular, data‑driven, and suitable for future expansion (e.g., adding a database, more sentiment keywords, or cloud APIs)
 
 ## 5. Summary of Added features (Part 2)
 * Login screen with name validation and clear error feedback
